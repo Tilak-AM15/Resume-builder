@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Interactive Resume Builder — Extended</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <div id="progress-bar-container"><div id="progress-bar"></div></div>
+    <div class="shell">
+      <div class="title">Interactive <span>Resume Builder</span></div>
+
+      <div class="template-selector" title="Choose template">
+        <div style="color:var(--muted);margin-right:6px">Template</div>
+        <button class="tpl-btn" data-tpl="modern" id="tplModern">Modern</button>
+        <button class="tpl-btn" data-tpl="minimal" id="tplMinimal">Minimal</button>
+        <button class="tpl-btn" data-tpl="classic" id="tplClassic">Classic</button>
+        <button class="tpl-btn" data-tpl="professional" id="tplProfessional">Professional</button>
+        <button class="tpl-btn" data-tpl="creative" id="tplCreative">Creative</button>
+      </div>
+
+      <div class="hdr-actions">
+        <button id="btnExport" class="small" title="Export as PDF">Export PDF</button>
+        <button id="btnDownload" class="small" title="Legacy: print dialog">Print</button>
+        <button id="btnClear" class="small" title="Clear form & storage">Clear</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- FORM PANEL -->
+    <section class="card form-card">
+      <div class="card-head">
+        <h2>Fill Your Details</h2><span class="muted" id="completionText">0% complete</span>
+      </div>
+      <div class="card-body">
+        <form id="resumeForm" autocomplete="off">
+          <div class="row">
+            <div>
+              <label for="name">Name</label>
+              <input id="name" name="name" placeholder="Enter Your Full Name" />
+            </div>
+            <div>
+              <label for="email">Email</label>
+              <input id="email" name="email" placeholder="you@example.com" />
+            </div>
+          </div>
+
+          <div class="row">
+            <div>
+              <label for="phone">Phone Number</label>
+              <input id="phone" name="phone" placeholder="+91 00000 00000" />
+            </div>
+            <div>
+              <label for="role">Current Role / Title</label>
+              <input id="role" name="role" placeholder="e.g., Frontend Developer" />
+            </div>
+          </div>
+
+          <div class="full">
+            <label for="summary">Profile Summary</label>
+            <textarea id="summary" name="summary" placeholder="A concise 2–3 line summary highlighting your strengths and goals."></textarea>
+          </div>
+
+          <!-- Social links -->
+          <div class="full">
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <label style="margin:0">Social / Links</label>
+              <div class="muted" style="font-size:.85rem">Add GitHub, LinkedIn, Portfolio, Twitter etc.</div>
+            </div>
+            <div id="linksList" class="grid-list" style="margin-top:8px"></div>
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <input id="linkLabel" placeholder="Label e.g., GitHub" />
+              <input id="linkUrl" placeholder="https://..." />
+              <button type="button" id="addLink">Add</button>
+            </div>
+          </div>
+
+          <!-- Photo & Templates -->
+          <div class="row">
+            <div>
+              <label>Profile Photo</label>
+              <div class="photo-uploader">
+                <div class="photo-preview" id="photoPreview"><span class="muted">No photo</span></div>
+                <div style="flex:1">
+                  <input type="file" id="photoInput" accept="image/*" />
+                  <div class="muted" style="font-size:.85rem;margin-top:6px">Max 2MB recommended. Click preview to remove.</div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <label>Quick Actions</label>
+              <div style="display:flex;gap:8px">
+                <button type="button" id="btnLoadSample">Load Sample</button>
+                <button type="button" id="btnSave">Save</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Skills -->
+          <div class="full">
+            <label>Skills</label>
+            <div class="row">
+              <div>
+                <div class="muted" style="margin-bottom:8px">Quick Select</div>
+                <div class="grid-list" id="skillsChecks"></div>
+              </div>
+              <div>
+                <div class="muted" style="margin-bottom:8px">Add Custom Skill</div>
+                <div class="add-line">
+                  <input id="skillInput" placeholder="Type a skill and press Add" />
+                  <button type="button" id="addSkill">Add</button>
+                </div>
+                <div class="chips" id="skillChips" style="margin-top:10px"></div>
+                <div class="muted" style="margin-top:8px">Tip: click a chip to remove; drag skills to rearrange on preview.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Education -->
+          <div class="full">
+            <div class="add-line" style="justify-content:space-between">
+              <label class="full" style="margin:0">Education</label>
+              <div>
+                <button type="button" id="addEdu">+ Add Education</button>
+              </div>
+            </div>
+            <div id="eduList" class="grid-list"></div>
+          </div>
+
+          <!-- Experience -->
+          <div class="full">
+            <div class="add-line" style="justify-content:space-between">
+              <label class="full" style="margin:0">Experience</label>
+              <div>
+                <button type="button" id="addExp">+ Add Experience</button>
+              </div>
+            </div>
+            <div id="expList" class="grid-list"></div>
+          </div>
+
+          <!-- Projects -->
+          <div class="full">
+            <div class="add-line" style="justify-content:space-between">
+              <label class="full" style="margin:0">Projects</label>
+              <div><button type="button" id="addProject">+ Add Project</button></div>
+            </div>
+            <div id="projList" class="grid-list"></div>
+          </div>
+
+          <!-- Certifications -->
+          <div class="full">
+            <div class="add-line" style="justify-content:space-between">
+              <label class="full" style="margin:0">Certifications</label>
+              <div><button type="button" id="addCert">+ Add Certification</button></div>
+            </div>
+            <div id="certList" class="grid-list"></div>
+          </div>
+
+        </form>
+      </div>
+    </section>
+
+    <!-- PREVIEW PANEL -->
+    <section class="card">
+      <div class="card-head"><h2>Live Preview</h2></div>
+      <div class="card-body">
+        <div id="resumePreview" class="resume anim-in tpl-modern" data-template="modern" style="min-height:420px">
+          <div style="display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap">
+            <div style="display:flex;gap:12px;align-items:center">
+              <div class="photo-preview" style="width:92px;height:92px;border-radius:12px" id="pPhotoPreview">
+                <img id="pPhotoImg" src="" alt="" style="display:none" />
+                <div id="pPhotoPlaceholder" class="muted">Photo</div>
+              </div>
+              <div>
+                <h1 id="pName">Your Name</h1>
+                <div class="sub" id="pTop">email@example.com • +91 00000 00000 • Role</div>
+                <div id="pLinks" style="margin-top:6px"></div>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div class="muted" style="font-size:.9rem">Generated</div>
+              <div id="generatedDate" class="muted" style="font-size:.8rem"></div>
+            </div>
+          </div>
+
+          <div class="section" id="secSummary">
+            <h3>Profile</h3>
+            <p id="pSummary" class="sub">Write a short professional summary. It updates as you type.</p>
+          </div>
+
+          <div class="two-col" style="margin-top:12px">
+            <div class="section">
+              <h3>Skills</h3>
+              <div class="chips" id="pSkills"></div>
+            </div>
+            <div class="section">
+              <h3>Education</h3>
+              <div class="edu" id="pEdu"></div>
+            </div>
+          </div>
+
+          <div class="section">
+            <h3>Experience</h3>
+            <div class="exp" id="pExp"></div>
+          </div>
+
+          <div class="section">
+            <h3>Projects</h3>
+            <div class="projects" id="pProjects"></div>
+          </div>
+
+          <div class="section">
+            <h3>Certifications</h3>
+            <div class="certs" id="pCerts"></div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Templates for dynamic items -->
+  <template id="tplEdu">
+    <div class="item">
+      <button type="button" class="del" title="Remove">✕</button>
+      <div class="row">
+        <div>
+          <label>Degree / Program</label>
+          <input data-key="degree" placeholder="e.g., B.E. in Computer Science" />
+        </div>
+        <div>
+          <label>University</label>
+          <input data-key="school" placeholder="University" />
+        </div>
+        <div>
+          <label>Institution</label>
+          <input data-key="college" placeholder="College/Institute" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Year Of Study</label>
+          <input data-key="studyYear" placeholder="e.g., 3rd Year / 2021" />
+        </div>
+        <div>
+          <label>Duration</label>
+          <input data-key="duration" placeholder="2021 – 2025" />
+        </div>
+        <div>
+          <label>CGPA / Score</label>
+          <input data-key="cgpa" placeholder="e.g., 8.6 / 10" />
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="tplExp">
+    <div class="item">
+      <button type="button" class="del" title="Remove">✕</button>
+      <div class="row">
+        <div>
+          <label>Job Title</label>
+          <input data-key="title" placeholder="Frontend Intern" />
+        </div>
+        <div>
+          <label>Company</label>
+          <input data-key="company" placeholder="Company" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label>Duration</label>
+          <input data-key="duration" placeholder="Jan 2024 – Jun 2024" />
+        </div>
+        <div>
+          <label>Summary</label>
+          <input data-key="desc" placeholder="Brief description of responsibilities" />
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="tplProject">
+    <div class="item">
+      <button type="button" class="del" title="Remove">✕</button>
+      <div>
+        <label>Project Title</label>
+        <input data-key="title" placeholder="Project Name" />
+      </div>
+      <div style="margin-top:8px">
+        <label>Short Description</label>
+        <input data-key="desc" placeholder="What you built / key tech" />
+      </div>
+      <div style="margin-top:8px" class="row">
+        <div>
+          <label>Link</label>
+          <input data-key="url" placeholder="https://..." />
+        </div>
+        <div>
+          <label>Role / Tech</label>
+          <input data-key="meta" placeholder="e.g., Frontend • React" />
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <template id="tplCert">
+    <div class="item">
+      <button type="button" class="del" title="Remove">✕</button>
+      <div class="row">
+        <div>
+          <label>Certification</label>
+          <input data-key="title" placeholder="Certification Name" />
+        </div>
+        <div>
+          <label>Issuer</label>
+          <input data-key="issuer" placeholder="Issuer e.g., Coursera" />
+        </div>
+      </div>
+      <div style="margin-top:8px">
+        <label>Year / Details</label>
+        <input data-key="year" placeholder="2024 • details or credential id" />
+      </div>
+    </div>
+  </template>
+
+  <!-- Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js" integrity="sha512-9xv/1y2bKq0gq1tF+3sB0u5V8Y3npe6djMSn95u42z3aKZ2w6kA8w7h1x4gq3j3yq5VgBAzHnQVYb3+0y7aN2Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://unpkg.com/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
